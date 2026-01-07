@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Life Countdown</title>
+    <style>
+        :root {
+            --bg-color: #0a0a0a;
+            --card-bg: #1a1a1a;
+            --accent-color: #00ff88;
+            --text-color: #e0e0e0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            font-weight: 200;
+            letter-spacing: 4px;
+            margin-bottom: 10px;
+            color: var(--accent-color);
+        }
+
+        .end-date {
+            font-size: 0.9rem;
+            opacity: 0.6;
+            margin-bottom: 30px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid #333;
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-color);
+        }
+
+        .number {
+            display: block;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.5;
+            margin-top: 5px;
+        }
+
+        .progress-container {
+            width: 100%;
+            max-width: 800px;
+            background: #333;
+            height: 10px;
+            border-radius: 5px;
+            margin-top: 40px;
+            overflow: hidden;
+        }
+
+        #progress-bar {
+            height: 100%;
+            background: var(--accent-color);
+            width: 0%;
+            transition: width 1s linear;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>MEMENTO MORI</h1>
+    <div class="end-date">Estimated End Date: December 31, 2062</div>
+
+    <div class="grid">
+        <div class="card"><span class="number" id="years">--</span><span class="label">Years</span></div>
+        <div class="card"><span class="number" id="quarters">--</span><span class="label">Quarters</span></div>
+        <div class="card"><span class="number" id="months">--</span><span class="label">Months</span></div>
+        <div class="card"><span class="number" id="weeks">--</span><span class="label">Weeks</span></div>
+        <div class="card"><span class="number" id="days">--</span><span class="label">Days</span></div>
+        <div class="card"><span class="number" id="hours">--</span><span class="label">Hours</span></div>
+        <div class="card"><span class="number" id="minutes">--</span><span class="label">Minutes</span></div>
+        <div class="card"><span class="number" id="seconds">--</span><span class="label">Seconds</span></div>
+    </div>
+
+    <div class="progress-container">
+        <div id="progress-bar"></div>
+    </div>
+
+    <script>
+        const birthDate = new Date('1987-10-01');
+        const deathDate = new Date('2062-12-31T23:59:59');
+        const totalLifeMs = deathDate - birthDate;
+
+        function updateTimer() {
+            const now = new Date();
+            const diff = deathDate - now;
+
+            if (diff <= 0) {
+                document.body.innerHTML = "<h1>Time is up.</h1>";
+                return;
+            }
+
+            // Calculations
+            const seconds = Math.floor(diff / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+            const weeks = Math.floor(days / 7);
+            
+            // Approximations for months/quarters/years
+            const years = diff / (1000 * 60 * 60 * 24 * 365.25);
+            const months = years * 12;
+            const quarters = years * 4;
+
+            // Update DOM
+            document.getElementById('years').innerText = years.toFixed(2);
+            document.getElementById('quarters').innerText = quarters.toFixed(1);
+            document.getElementById('months').innerText = Math.floor(months).toLocaleString();
+            document.getElementById('weeks').innerText = Math.floor(weeks).toLocaleString();
+            document.getElementById('days').innerText = Math.floor(days).toLocaleString();
