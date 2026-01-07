@@ -11,11 +11,10 @@
             --accent-color: #00ff88;
             --text-color: #e0e0e0;
         }
-
         body {
             background-color: var(--bg-color);
             color: var(--text-color);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -24,79 +23,39 @@
             margin: 0;
             padding: 20px;
         }
-
-        h1 {
-            font-weight: 200;
-            letter-spacing: 4px;
-            margin-bottom: 10px;
-            color: var(--accent-color);
-        }
-
-        .end-date {
-            font-size: 0.9rem;
-            opacity: 0.6;
-            margin-bottom: 30px;
-        }
-
+        h1 { font-weight: 200; letter-spacing: 4px; color: var(--accent-color); margin-bottom: 0; }
+        .end-date { font-size: 0.8rem; opacity: 0.5; margin-bottom: 30px; }
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
             width: 100%;
-            max-width: 800px;
+            max-width: 900px;
         }
-
         .card {
             background: var(--card-bg);
             padding: 20px;
             border-radius: 12px;
             text-align: center;
             border: 1px solid #333;
-            transition: transform 0.2s;
         }
-
-        .card:hover {
-            transform: translateY(-5px);
-            border-color: var(--accent-color);
-        }
-
-        .number {
-            display: block;
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: #fff;
-        }
-
-        .label {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            opacity: 0.5;
-            margin-top: 5px;
-        }
-
+        .number { display: block; font-size: 1.6rem; font-weight: bold; color: #fff; }
+        .label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.5; }
         .progress-container {
             width: 100%;
-            max-width: 800px;
-            background: #333;
-            height: 10px;
-            border-radius: 5px;
+            max-width: 900px;
+            background: #222;
+            height: 8px;
+            border-radius: 4px;
             margin-top: 40px;
-            overflow: hidden;
         }
-
-        #progress-bar {
-            height: 100%;
-            background: var(--accent-color);
-            width: 0%;
-            transition: width 1s linear;
-        }
+        #progress-bar { height: 100%; background: var(--accent-color); width: 0%; transition: width 1s linear; }
     </style>
 </head>
 <body>
 
     <h1>MEMENTO MORI</h1>
-    <div class="end-date">Estimated End Date: December 31, 2062</div>
+    <div class="end-date">Estimated: Dec 31, 2062</div>
 
     <div class="grid">
         <div class="card"><span class="number" id="years">--</span><span class="label">Years</span></div>
@@ -109,39 +68,65 @@
         <div class="card"><span class="number" id="seconds">--</span><span class="label">Seconds</span></div>
     </div>
 
-    <div class="progress-container">
-        <div id="progress-bar"></div>
-    </div>
+    <div class="progress-container"><div id="progress-bar"></div></div>
 
     <script>
-        const birthDate = new Date('1987-10-01');
-        const deathDate = new Date('2062-12-31');
-        const totalLifeMs = deathDate - birthDate;
-
         function updateTimer() {
-            const now = new Date();
-            const diff = deathDate - now;
+            try {
+                // Using explicit numbers for the date to avoid timezone/format errors
+                // Date(year, monthIndex, day, hours, minutes, seconds)
+                // Note: Month is 0-indexed (0=Jan, 9=Oct)
+                const birthDate = new Date(1987, 9, 1); 
+                const deathDate = new Date(2062, 12, 31);
+                const now = new Date();
+                
+                const diff = deathDate - now;
+                const totalLife = deathDate - birthDate;
 
-            if (diff <= 0) {
-                document.body.innerHTML = "<h1>Time is up.</h1>";
-                return;
+                if (diff <= 0) {
+                    document.querySelector('h1').innerText = "TIME EXPIRED";
+                    return;
+                }
+
+                // Math constants
+                const second = 1000;
+                const minute = second * 60;
+                const hour = minute * 60;
+                const day = hour * 24;
+                const yearMs = day * 365.25;
+
+                // Value Calculations
+                const y = diff / yearMs;
+                const q = y * 4;
+                const m = y * 12;
+                const w = diff / (day * 7);
+                const d = diff / day;
+                const hr = diff / hour;
+                const min = diff / minute;
+                const sec = diff / second;
+
+                // Push to Screen
+                document.getElementById('years').innerText = y.toFixed(2);
+                document.getElementById('quarters').innerText = q.toFixed(1);
+                document.getElementById('months').innerText = Math.floor(m).toLocaleString();
+                document.getElementById('weeks').innerText = Math.floor(w).toLocaleString();
+                document.getElementById('days').innerText = Math.floor(d).toLocaleString();
+                document.getElementById('hours').innerText = Math.floor(hr).toLocaleString();
+                document.getElementById('minutes').innerText = Math.floor(min).toLocaleString();
+                document.getElementById('seconds').innerText = Math.floor(sec).toLocaleString();
+
+                // Progress Bar
+                const lived = now - birthDate;
+                const percent = (lived / totalLife) * 100;
+                document.getElementById('progress-bar').style.width = percent + "%";
+
+            } catch (err) {
+                console.log("Timer Error:", err);
             }
+        }
 
-            // Calculations
-            const seconds = Math.floor(diff / 1000);
-            const minutes = Math.floor(seconds / 60);
-            const hours = Math.floor(minutes / 60);
-            const days = Math.floor(hours / 24);
-            const weeks = Math.floor(days / 7);
-            
-            // Approximations for months/quarters/years
-            const years = diff / (1000 * 60 * 60 * 24 * 365.25);
-            const months = years * 12;
-            const quarters = years * 4;
-
-            // Update DOM
-            document.getElementById('years').innerText = years.toFixed(2);
-            document.getElementById('quarters').innerText = quarters.toFixed(1);
-            document.getElementById('months').innerText = Math.floor(months).toLocaleString();
-            document.getElementById('weeks').innerText = Math.floor(weeks).toLocaleString();
-            document.getElementById('days').innerText = Math.floor(days).toLocaleString();
+        setInterval(updateTimer, 1000);
+        updateTimer();
+    </script>
+</body>
+</html>
